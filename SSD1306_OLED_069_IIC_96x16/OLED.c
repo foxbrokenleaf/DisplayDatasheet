@@ -54,6 +54,8 @@ uint8_t OLED_DisplayBuf[2][96];  // [页][列]，2页 * 96列
 #define OLED_SCL_PIN GPIO_Pin_6
 #define OLED_SDA_PORT GPIOB
 #define OLED_SDA_PIN GPIO_Pin_7
+#define OLED_RST_PORT GPIOB
+#define OLED_RST_PIN GPIO_Pin_8
 
 /*********************全局变量*/
 
@@ -80,6 +82,16 @@ void OLED_W_SDA(uint8_t BitValue)
 }
 
 /**
+  * 函    数：OLED写RST高低电平
+  * 参    数：要写入RST的电平值，范围：0/1
+  * 返 回 值：无
+  */
+void OLED_W_RST(uint8_t BitValue)
+{
+    GPIO_WriteBit(OLED_RST_PORT, OLED_RST_PIN, (BitAction)BitValue);
+}
+
+/**
   * 函    数：OLED引脚初始化
   * 参    数：无
   * 返 回 值：无
@@ -100,6 +112,11 @@ void OLED_GPIO_Init(void)
     tmp.GPIO_Pin = OLED_SDA_PIN;
     tmp.GPIO_Speed = GPIO_Speed_2MHz;
     GPIO_Init(GPIOB, &tmp); 
+
+    tmp.GPIO_Mode = GPIO_Mode_Out_PP;
+    tmp.GPIO_Pin = OLED_RST_PIN;
+    tmp.GPIO_Speed = GPIO_Speed_2MHz;
+    GPIO_Init(GPIOB, &tmp);    
     
     /*在初始化前，加入适量延时，待OLED供电稳定*/
     for (i = 0; i < 1000; i ++)
@@ -110,6 +127,8 @@ void OLED_GPIO_Init(void)
     /*释放SCL和SDA*/
     OLED_W_SCL(1);
     OLED_W_SDA(1);
+    OLED_W_RST(0);
+    OLED_W_RST(1);
 }
 
 /*********************引脚配置*/
